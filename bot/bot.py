@@ -752,8 +752,9 @@ def send_summary_email(bot, update):
 
     TO = result[1]
 
+    now = datetime.datetime.now()
     exercise_events = get_values("exercise", start_date=get_x_days_before(now, 7), \
-                                            end_date=datetime.datetime.now(), user_id=user[0])
+                                            end_date=now, user_id=user[0])
 
     TEXT = "Hi "+user[1]+"!\n\
 \n\
