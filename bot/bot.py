@@ -1,10 +1,12 @@
 from collections import defaultdict
 from email.utils import parseaddr
 import datetime
+from email.mime.text import MIMEText
 import math
 import os
 import re
 from pytz import timezone, all_timezones
+import smtplib
 
 import dateparser
 import matplotlib
@@ -29,6 +31,9 @@ DB_NAME = os.environ.get('DB_NAME', 'zenirlbot')
 DB_USER = os.environ.get('DB_USER', 'postgres')
 DB_PASSWORD = os.environ.get('DB_PASSWORD', 'password')
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
+
+GMAIL_EMAIL = os.environ.get('GMAIL_EMAIL', None)
+GMAIL_PASSWORD = os.environ.get('GMAIL_PASSWORD', None)
 
 def get_connection():
     global CONNECTION
@@ -401,6 +406,10 @@ def summary(bot, update):
         bot.send_message(chat_id=update.message.from_user.id, text="📧 Please give your email address or `off`!")
         return
 
+    if parts[1] == "now":
+        send_summary_email(bot, update)
+        return
+
     if parts[1] == "off":
         cursor = get_connection().cursor()
         cursor.execute('DELETE FROM summary WHERE id = %s', (update.message.from_user.id,))
@@ -729,6 +738,50 @@ def generate_linechart_report_from(table, filename, user, start_date, end_date):
     plt.plot(dates, ratings)
     plt.savefig(filename)
     plt.close()
+
+def send_summary_email(bot, update):
+    user = get_or_create_user(bot, update)
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM summary WHERE id = %s', (user[0],))
+    result = cursor.fetchone()
+    cursor.close()
+
+    if result is None:
+        bot.send_message(chat_id=update.message.chat_id, text="📧 Please set your email!")
+        return
+
+    TO = result[1]
+    TEXT = "Hi "+user[1]+"!\n\
+\n\
+Here are your logged stats for the last seven days:\n\
+\n\
+🙏 Meditated X total minutes\n\
+🔥 Meditation streak is at X days in a row\n\
+😴 Slept on average X hours per night\n\
+🙂 Average happiness level was X\n\
+😅 Average anxiety level was X\n\
+💪 Exercised X times\n\
+\n\
+❤️  Mindful Makers\n\
+https://mindfulmakers.club/"
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login(GMAIL_EMAIL, GMAIL_PASSWORD)
+
+    try:
+        m = MIMEText(TEXT.encode("UTF-8"), 'plain', "UTF-8")
+        m["From"] = "Mindful Makers <"+GMAIL_EMAIL+">"
+        m["To"] = TO
+        m["Subject"] = "⛩ Weekly Summary"
+        server.sendmail(GMAIL_EMAIL, [TO], m.as_string())
+        bot.send_message(chat_id=update.message.chat_id, text="✅ Summary email sent!")
+    except Exception as e:
+        bot.send_message(chat_id=update.message.chat_id, text="📧 Couldn't send email summary!")
+        print(e)
+
+    server.quit()
 
 # Returns number of seconds until xx:00:00.
 # If currently 11:43:23, then should return 37 + 60 * 16
