@@ -765,7 +765,7 @@ Here are your logged stats for the last seven days:\n\
 😴 Slept on average X hours per night\n\
 🙂 Average happiness level was X\n\
 😅 Average anxiety level was X\n\
-💪 Exercised "+len(exercise_events)+" times\n\
+💪 Exercised "+str(len(exercise_events))+" times\n\
 \n\
 ❤️  Mindful Makers\n\
 https://mindfulmakers.club/"
