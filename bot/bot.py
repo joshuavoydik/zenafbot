@@ -751,6 +751,10 @@ def send_summary_email(bot, update):
         return
 
     TO = result[1]
+
+    exercise_events = get_values("exercise", start_date=get_x_days_before(now, 7), \
+                                            end_date=datetime.datetime.now(), user_id=user[0])
+
     TEXT = "Hi "+user[1]+"!\n\
 \n\
 Here are your logged stats for the last seven days:\n\
@@ -760,7 +764,7 @@ Here are your logged stats for the last seven days:\n\
 😴 Slept on average X hours per night\n\
 🙂 Average happiness level was X\n\
 😅 Average anxiety level was X\n\
-💪 Exercised X times\n\
+💪 Exercised "+len(exercise_events)+" times\n\
 \n\
 ❤️  Mindful Makers\n\
 https://mindfulmakers.club/"
