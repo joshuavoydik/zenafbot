@@ -752,20 +752,29 @@ def send_summary_email(bot, update):
 
     TO = result[1]
 
+    def mean(numbers):
+        return float(sum(numbers)) / max(len(numbers), 1)
+
     now = datetime.datetime.now()
-    exercise_events = get_values("exercise", start_date=get_x_days_before(now, 7), \
-                                            end_date=now, user_id=user[0])
+    seven_days_ago = get_x_days_before(now, 7)
+    meditation_streak = str(get_streak_of(user[0]))
+    exercise_events = get_values("exercise", start_date=seven_days_ago, end_date=now, user_id=user[0])
+    exercise_events_len = str(len(exercise_events))
+    meditation_events = get_values("meditation", start_date=seven_days_ago, end_date=now, user_id=user[0])
+    meditation_sum = str(sum([v[1] for v in meditation_events]))
+    sleep_events = get_values("sleep", start_date=seven_days_ago, end_date=now, user_id=user[0])
+    sleep_mean = str(mean([v[1] for v in sleep_events]))
 
     TEXT = "Hi "+user[1]+"!\n\
 \n\
 Here are your logged stats for the last seven days:\n\
 \n\
-🙏 Meditated X total minutes\n\
-🔥 Meditation streak is at "+str(get_streak_of(user[0]))+" days in a row\n\
-😴 Slept on average X hours per night\n\
+🙏 Meditated "+meditation_sum+" total minutes\n\
+🔥 Meditation streak is at "+meditation_streak+" days in a row\n\
+😴 Slept on average "+sleep_mean+" hours per night\n\
 🙂 Average happiness level was X\n\
 😅 Average anxiety level was X\n\
-💪 Exercised "+str(len(exercise_events))+" times\n\
+💪 Exercised "+exercise_events_len+" times\n\
 \n\
 ❤️  Mindful Makers\n\
 https://mindfulmakers.club/"
