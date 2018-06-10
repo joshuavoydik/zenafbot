@@ -756,7 +756,7 @@ def send_summary_email(bot, update):
         return float(sum(numbers)) / max(len(numbers), 1)
 
     now = datetime.datetime.now()
-    seven_days_ago = get_x_days_before(now, 7)
+    seven_days_ago = get_x_days_before(now, 7).replace(hour=0, minute=0, second=0)
     meditation_streak = str(get_streak_of(user[0]))
     exercise_events = get_values("exercise", start_date=seven_days_ago, end_date=now, user_id=user[0])
     exercise_events_len = str(len(exercise_events))
