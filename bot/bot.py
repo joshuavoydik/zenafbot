@@ -756,7 +756,7 @@ def send_summary_email(bot, update):
 Here are your logged stats for the last seven days:\n\
 \n\
 🙏 Meditated X total minutes\n\
-🔥 Meditation streak is at X days in a row\n\
+🔥 Meditation streak is at "+get_streak_of(user[0])+" days in a row\n\
 😴 Slept on average X hours per night\n\
 🙂 Average happiness level was X\n\
 😅 Average anxiety level was X\n\
