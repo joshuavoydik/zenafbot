@@ -764,6 +764,10 @@ def send_summary_email(bot, update):
     meditation_sum = str(sum([v[1] for v in meditation_events]))
     sleep_events = get_values("sleep", start_date=seven_days_ago, end_date=now, user_id=user[0])
     sleep_mean = str(mean([v[1] for v in sleep_events]))
+    happiness_events = get_values("happiness", start_date=seven_days_ago, end_date=now, user_id=user[0])
+    happiness_mean = str(mean([v[1] for v in happiness_events]))
+    anxiety_events = get_values("anxiety", start_date=seven_days_ago, end_date=now, user_id=user[0])
+    anxiety_mean = str(mean([v[1] for v in anxiety_events]))
 
     TEXT = "Hi "+user[1]+"!\n\
 \n\
@@ -772,8 +776,8 @@ Here are your logged stats for the last seven days:\n\
 🙏 Meditated "+meditation_sum+" total minutes\n\
 🔥 Meditation streak is at "+meditation_streak+" days in a row\n\
 😴 Slept on average "+sleep_mean+" hours per night\n\
-🙂 Average happiness level was X\n\
-😅 Average anxiety level was X\n\
+🙂 Average happiness level was "+happiness_mean+"\n\
+😅 Average anxiety level was "+anxiety_mean+"\n\
 💪 Exercised "+exercise_events_len+" times\n\
 \n\
 ❤️  Mindful Makers\n\
